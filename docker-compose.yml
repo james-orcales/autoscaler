@@ -1,0 +1,32 @@
+services:
+  backend:
+    build: ./backend
+    mem_limit: 4g
+    environment:
+      - SILENCE_LOGS=false
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8080/health || exit 1"]
+      interval: 2s
+      retries: 5
+  worker:
+    build: ./worker
+    environment:
+      - MIN_COMPUTE_DELAY_MILLISECOND=100
+      - MAX_COMPUTE_DELAY_MILLISECOND=200
+    depends_on:
+      backend:
+        condition: service_healthy
+  workload:
+    build: ./workload
+    environment:
+      - REQUESTS_PER_SECOND=100
+      - MAX_TASKS_CREATED=500
+      # Don't set this too high. Artifically delay the compute instead to save memory.
+      - MAX_STRING_LENGTH=30
+      - MAX_FETCH_STATUS_RETRY_SECOND=30
+    depends_on:
+      backend:
+        condition: service_healthy
+
