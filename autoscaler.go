@@ -34,7 +34,8 @@ func main() {
 		panic("CONSECUTIVE_REDUCTION_THRESHOLD must be positive")
 	}
 
-	var previous []int
+	var previous_arr [3]int
+	previous := previous_arr[:0]
 	for {
 		time.Sleep(CHECK_FREQUENCY_SECOND)
 		resp, err := http.Get("http://localhost:8080/__SUPER_DUPER_SECRET_PENDING_COUNT__")
@@ -48,15 +49,16 @@ func main() {
 
 		fmt.Printf("pending tasks=%d n_workers=%d\n", pending, n_workers)
 
-		previous = append(previous, pending)
-		if len(previous) > CONSECUTIVE_REDUCTION_THRESHOLD {
+		if len(previous) == CONSECUTIVE_REDUCTION_THRESHOLD {
 			previous = previous[1:]
 		}
+		previous = append(previous, pending)
 
-		decreasing := true
+		decreasing := false
 		if CONSECUTIVE_REDUCTION_THRESHOLD == 1 {
 			decreasing = pending < previous[0]
-		} else {
+		} else if len(previous) == CONSECUTIVE_REDUCTION_THRESHOLD {
+			decreasing = true
 			for i := 1; i < len(previous); i++ {
 				if previous[i] == 0 && previous[i-1] == 0 {
 					continue
@@ -85,6 +87,7 @@ func main() {
 				fmt.Printf("traffic is slowing down. resetting to %d worker\n", n)
 			}
 		}
+		n = max(1, n)
 		spawn("", nil, "docker", "compose", "up", "--no-recreate", "--detach", fmt.Sprintf("--scale=%s=%d", WORKER_SERVICE_NAME, n))
 	}
 }
