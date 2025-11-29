@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"runtime"
 	"strconv"
 	"sync"
 	"sync/atomic"
@@ -36,6 +37,7 @@ var (
 )
 
 func main() {
+	runtime.GOMAXPROCS(1)
 	t := time.NewTicker(time.Second / time.Duration(REQUESTS_PER_SECOND))
 
 	println("begin pushing tasks")
