@@ -22,10 +22,9 @@ services:
     build: ./workload
     environment:
       - REQUESTS_PER_SECOND=100
-      - MAX_TASKS_CREATED=500
+      - MAX_TASKS_CREATED=5000
       # Don't set this too high. Artifically delay the compute instead to save memory.
-      - MAX_STRING_LENGTH=30
-      - MAX_FETCH_STATUS_RETRY_SECOND=30
+      - MAX_STRING_LENGTH=20
     depends_on:
       backend:
         condition: service_healthy
