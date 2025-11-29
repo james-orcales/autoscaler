@@ -40,7 +40,6 @@ func main() {
 	runtime.GOMAXPROCS(1)
 
 	lgr := itlog.New(os.Stdout, itlog.LevelInfo)
-	lgr.Info().Msg("worker initialized")
 	lgr.Level = itlog.LevelWarn
 
 	var last_id int64 = -1
